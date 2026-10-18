@@ -1,12 +1,22 @@
 //! Derive macro for the [`PhysAddr`] trait.
 //!
-//! [`PhysAddr`]: https://docs.rs/the-memblock/latest/the_memblock/addr/trait.PhysAddr.html
+//! [`PhysAddr`]: https://docs.rs/the-mm-core/latest/the_mm_core/trait.PhysAddr.html
 //!
 //! [`#[derive(PhysAddr)]`](derive@PhysAddr) generates a transparent
 //! implementation for a single-field tuple struct wrapping another
 //! [`PhysAddr`] implementor, e.g. `struct Addr(usize)`. All arithmetic is
 //! delegated to the inner type, so the overflow-safety and panicking
 //! guarantees of [`PhysAddr`] are preserved.
+//!
+//! The trait is defined in the shared `the-mm-core` crate and re-exported
+//! by `the-memblock`, so the same address type works with the buddy and
+//! slab allocators too.
+//!
+//! PFN conversions are not part of `PhysAddr`; they live in
+//! `the_mm_core::PageFrame`. A custom type that needs
+//! `Memblock::mem_pfn_ranges` must also implement `PageFrame` (primitive
+//! types already do, and `#[derive(the_buddy_system::PageFrame)]` generates
+//! it).
 //!
 //! In addition to the `PhysAddr` implementation, the derive generates the
 //! `Clone`, `Copy`, `PartialEq`, `Eq`, `PartialOrd`, `Ord`, `Debug`,
@@ -38,7 +48,7 @@ use syn::{Data, DeriveInput, Fields, Ident, Type, parse_macro_input};
 /// Derives [`PhysAddr`] and its required supertrait implementations for a
 /// single-field tuple struct.
 ///
-/// [`PhysAddr`]: https://docs.rs/the-memblock/latest/the_memblock/addr/trait.PhysAddr.html
+/// [`PhysAddr`]: https://docs.rs/the-mm-core/latest/the_mm_core/trait.PhysAddr.html
 #[proc_macro_derive(PhysAddr)]
 pub fn derive_phys_addr(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -162,18 +172,6 @@ fn expand(input: &DeriveInput) -> syn::Result<TokenStream2> {
 
             fn align_down(addr: Self, alignment: Self) -> Self {
                 #name(<#inner as #phys>::align_down(addr.0, alignment.0))
-            }
-
-            fn pfn_up(addr: Self, page_size: Self) -> Self {
-                #name(<#inner as #phys>::pfn_up(addr.0, page_size.0))
-            }
-
-            fn pfn_down(addr: Self, page_size: Self) -> Self {
-                #name(<#inner as #phys>::pfn_down(addr.0, page_size.0))
-            }
-
-            fn pfn_to_phys(pfn: Self, page_size: Self) -> Self {
-                #name(<#inner as #phys>::pfn_to_phys(pfn.0, page_size.0))
             }
         }
     })
