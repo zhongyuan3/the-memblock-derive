@@ -110,7 +110,7 @@ fn crate_path() -> TokenStream2 {
 fn expand(input: &DeriveInput) -> syn::Result<TokenStream2> {
     let (name, inner) = single_field(input)?;
     let path = crate_path();
-    let phys = quote!(#path::addr::PhysAddr);
+    let phys = quote!(#path::PhysAddr);
     let debug_name = name.to_string();
 
     Ok(quote! {

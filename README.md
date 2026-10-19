@@ -47,4 +47,4 @@ code, which is written against `::core` and is therefore no_std-clean.
 
 MIT. See [LICENSE](LICENSE).
 
-[`PhysAddr`]: https://docs.rs/the-memblock/latest/the_memblock/addr/trait.PhysAddr.html
+[`PhysAddr`]: https://docs.rs/the-memblock/latest/the_memblock/trait.PhysAddr.html
