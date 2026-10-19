@@ -23,8 +23,7 @@ the crate root, so there is no need to depend on `the-memblock-derive`
 directly.
 
 ```rust
-use the_memblock::flags::MemblockFlags;
-use the_memblock::memblock::Memblock;
+use the_memblock::Memblock;
 use the_memblock::PhysAddr;
 
 #[derive(PhysAddr)]
@@ -32,8 +31,8 @@ use the_memblock::PhysAddr;
 struct Addr(usize);
 
 let mut mb = Memblock::<Addr, 8>::new();
-mb.add(Addr(0x1000), Addr(0x1000), MemblockFlags::NONE).unwrap();
-let base = mb.phys_alloc(Addr(0x100), Addr(0x100), MemblockFlags::NONE).unwrap();
+mb.add(Addr(0x1000), Addr(0x1000)).unwrap();
+let base = mb.phys_alloc(Addr(0x100), Addr(0x100)).unwrap();
 assert_eq!(base, Addr(0x1f00));
 ```
 
