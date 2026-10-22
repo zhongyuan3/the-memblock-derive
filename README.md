@@ -10,8 +10,10 @@ so the overflow-safety and panicking guarantees of [`PhysAddr`] are
 preserved.
 
 The derive also implements the supertraits that [`PhysAddr`] requires
-(`Clone`, `Copy`, `PartialEq`, `Eq`, `PartialOrd`, `Ord`, `Debug`, `Add`,
+(`Clone`, `Copy`, `PartialEq`, `Eq`, `PartialOrd`, `Ord`, `Add`,
 `Sub`), so a `#[derive(PhysAddr)] struct Addr(usize);` works out of the box.
+`Debug` is not generated; add it to the derive list if you need to format the
+address type.
 
 Only concrete, non-generic tuple structs with exactly one field are
 supported.
@@ -33,7 +35,7 @@ struct Addr(usize);
 let mut mb = Memblock::<Addr, 8>::new();
 mb.add(Addr(0x1000), Addr(0x1000)).unwrap();
 let base = mb.phys_alloc(Addr(0x100), Addr(0x100)).unwrap();
-assert_eq!(base, Addr(0x1f00));
+assert!(base == Addr(0x1f00));
 ```
 
 ## no_std note

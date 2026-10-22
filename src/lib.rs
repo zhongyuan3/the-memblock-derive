@@ -19,9 +19,11 @@
 //! it).
 //!
 //! In addition to the `PhysAddr` implementation, the derive generates the
-//! `Clone`, `Copy`, `PartialEq`, `Eq`, `PartialOrd`, `Ord`, `Debug`,
-//! `Add` and `Sub` implementations that the trait requires as supertraits,
+//! `Clone`, `Copy`, `PartialEq`, `Eq`, `PartialOrd`, `Ord`, `Add`
+//! and `Sub` implementations that the trait requires as supertraits,
 //! so `#[derive(PhysAddr)] struct Addr(usize);` works out of the box.
+//! `Debug` is not generated; add it to the derive list if you need to format
+//! the address type.
 //!
 //! Only concrete, non-generic tuple structs with exactly one field are
 //! supported.
@@ -38,7 +40,6 @@
 extern crate alloc;
 
 use alloc::format;
-use alloc::string::ToString;
 use proc_macro::TokenStream;
 use proc_macro_crate::{FoundCrate, crate_name};
 use proc_macro2::TokenStream as TokenStream2;
@@ -111,7 +112,6 @@ fn expand(input: &DeriveInput) -> syn::Result<TokenStream2> {
     let (name, inner) = single_field(input)?;
     let path = crate_path();
     let phys = quote!(#path::PhysAddr);
-    let debug_name = name.to_string();
 
     Ok(quote! {
         impl Clone for #name {
@@ -139,12 +139,6 @@ fn expand(input: &DeriveInput) -> syn::Result<TokenStream2> {
         impl Ord for #name {
             fn cmp(&self, other: &Self) -> ::core::cmp::Ordering {
                 ::core::cmp::Ord::cmp(&self.0, &other.0)
-            }
-        }
-
-        impl ::core::fmt::Debug for #name {
-            fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-                f.debug_tuple(#debug_name).field(&self.0).finish()
             }
         }
 
